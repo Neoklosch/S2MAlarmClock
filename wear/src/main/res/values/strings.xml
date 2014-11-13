@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">S2M Alarm Clock</string>
+    <string name="hello_round">Hello Round World!</string>
+    <string name="hello_square">Hello Square World!</string>
+
+    <string name="watch_face_default_time">12:00</string>
+    <string name="watch_face_default_alarm">12:00</string>
+    <string name="watch_face_default_battery">90 %</string>
+
+</resources>

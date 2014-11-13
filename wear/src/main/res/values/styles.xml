@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="WatchFace" />
+
+    <style name="WatchFace.Text" parent="TextAppearance.Wearable.Large">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+</resources>

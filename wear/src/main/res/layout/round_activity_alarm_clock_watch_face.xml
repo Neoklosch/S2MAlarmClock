@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:background="@drawable/watch_face_background_drawable">
+
+    <TextView
+        android:id="@+id/activity_alarm_clock_watch_face_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        style="@style/WatchFace.Text"
+        android:text="@string/watch_face_default_time" />
+
+    <TextView
+        android:id="@+id/activity_alarm_clock_watch_face_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/activity_alarm_clock_watch_face_time"
+        style="@style/WatchFace.Text"
+        android:text="@string/watch_face_default_alarm" />
+
+    <TextView
+        android:id="@+id/activity_alarm_clock_watch_face_battery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/activity_alarm_clock_watch_face_alarm"
+        style="@style/WatchFace.Text"
+        android:text="@string/watch_face_default_battery" />
+
+</RelativeLayout>
