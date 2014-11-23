@@ -3,7 +3,7 @@
     package="android.s2m.com.s2malarmclock" >
 
     <uses-feature android:name="android.hardware.type.watch" />
-    <!-- <uses-permission android:name="com.android.alarm.permission.SET_ALARM" /> -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
     <application
         android:allowBackup="true"
@@ -41,6 +41,8 @@
             </intent-filter>
 
         </activity>
+        
+        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
 
         <!-- Custom Service -->
         <service android:name=".AlarmClockService">

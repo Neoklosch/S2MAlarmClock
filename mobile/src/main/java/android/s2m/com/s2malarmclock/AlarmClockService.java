@@ -1,7 +1,6 @@
 package android.s2m.com.s2malarmclock;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.provider.AlarmClock;
 import android.util.Log;
 
@@ -12,7 +11,6 @@ import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -22,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class AlarmClockService extends WearableListenerService {
     private static final String TAG = "AlarmClockService";
 
-    private static final String ALARM_PATH = "/alarm-watch";
+    private static final String ALARM_PATH = "/alarm-phone";
     private static final String HOURS_KEY = "hours";
     private static final String MINUTES_KEY = "minutes";
     GoogleApiClient mGoogleApiClient;
@@ -62,7 +60,7 @@ public class AlarmClockService extends WearableListenerService {
                     Intent setAlarmClockIntent = new Intent(AlarmClock.ACTION_SET_ALARM);
                     setAlarmClockIntent.putExtra(AlarmClock.EXTRA_HOUR, hours);
                     setAlarmClockIntent.putExtra(AlarmClock.EXTRA_MINUTES, minutes);
-                    setAlarmClockIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "Wear Alarm from service");
+                    setAlarmClockIntent.putExtra(AlarmClock.EXTRA_MESSAGE, "Phone Alarm from service");
                     setAlarmClockIntent.putExtra(AlarmClock.EXTRA_VIBRATE, true);
                     setAlarmClockIntent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
                     setAlarmClockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -2,10 +2,13 @@ package android.s2m.com.s2malarmclock;
 
 import android.content.Intent;
 import android.content.IntentSender;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.AlarmClock;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
@@ -22,6 +25,8 @@ import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.Collection;
@@ -31,10 +36,12 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements DataApi.DataListener,
         MessageApi.MessageListener, NodeApi.NodeListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, TimePicker.OnTimeChangedListener, View.OnClickListener {
+        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     private static final String LOG_TAG = "MainActivity";
     private static final int REQUEST_RESOLVE_ERROR = 1000;
-    private static final String START_ACTIVITY_PATH = "/start-activity";
+    private static final String ALARM_PATH = "/alarm-watch";
+    private static final String HOURS_KEY = "hours";
+    private static final String MINUTES_KEY = "minutes";
 
     private TimePicker mTimePicker;
     private GoogleApiClient mGoogleApiClient;
@@ -47,7 +54,7 @@ public class MainActivity extends ActionBarActivity implements DataApi.DataListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTimePicker = (TimePicker) findViewById(R.id.mainActivityTimePicker);
-        mTimePicker.setOnTimeChangedListener(this);
+        mTimePicker.setIs24HourView(true);
         mSetAlarmButton = (Button) findViewById(R.id.mainActivitySetAlarmButton);
         mSetAlarmButton.setOnClickListener(this);
         mSetAlarmButton.setVisibility(View.GONE);
@@ -79,15 +86,10 @@ public class MainActivity extends ActionBarActivity implements DataApi.DataListe
     }
 
     @Override
-    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-
-    }
-
-    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.mainActivitySetAlarmButton:
-//                setAlarm(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
+                setAlarm(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
                 syncAlarm(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
                 break;
             default:
@@ -105,7 +107,7 @@ public class MainActivity extends ActionBarActivity implements DataApi.DataListe
     }
 
     public void syncAlarm(int hours, int minutes) {
-        new StartWearableActivityTask().execute();
+        new StartWearableActivityTask().execute(hours, minutes);
     }
 
     @Override
@@ -177,13 +179,13 @@ public class MainActivity extends ActionBarActivity implements DataApi.DataListe
         }
     }
 
-    private class StartWearableActivityTask extends AsyncTask<Void, Void, Void> {
+    private class StartWearableActivityTask extends AsyncTask<Integer, Void, Void> {
 
         @Override
-        protected Void doInBackground(Void... args) {
+        protected Void doInBackground(Integer... args) {
             Collection<String> nodes = getNodes();
             for (String node : nodes) {
-                sendStartActivityMessage(node);
+                sendStartActivityMessage(node, args[0], args[1]);
             }
             return null;
         }
@@ -201,19 +203,39 @@ public class MainActivity extends ActionBarActivity implements DataApi.DataListe
         return results;
     }
 
-    private void sendStartActivityMessage(String node) {
-        Wearable
-            .MessageApi
-            .sendMessage(mGoogleApiClient, node, START_ACTIVITY_PATH, new byte[0])
-            .setResultCallback(
-                new ResultCallback<MessageApi.SendMessageResult>() {
-                    @Override
-                    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                        if (!sendMessageResult.getStatus().isSuccess()) {
-                            Toast.makeText(getApplicationContext(), "Message send", Toast.LENGTH_SHORT).show();
+    private void sendStartActivityMessage(String node, int hours, int minutes) {
+        AlarmClockDataGenerator alarmClockDataGenerator = new AlarmClockDataGenerator(hours, minutes);
+        alarmClockDataGenerator.run();
+
+    }
+
+    private class AlarmClockDataGenerator implements Runnable {
+        private int mHours;
+        private int mMinutes;
+
+        public AlarmClockDataGenerator(int hours, int minutes) {
+            mHours = hours;
+            mMinutes = minutes;
+        }
+
+        @Override
+        public void run() {
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(ALARM_PATH);
+            putDataMapRequest.getDataMap().putInt(HOURS_KEY, mHours);
+            putDataMapRequest.getDataMap().putInt(MINUTES_KEY, mMinutes);
+            PutDataRequest request = putDataMapRequest.asPutDataRequest();
+            if (!mGoogleApiClient.isConnected()) {
+                return;
+            }
+            Wearable.DataApi.putDataItem(mGoogleApiClient, request)
+                    .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                        @Override
+                        public void onResult(DataApi.DataItemResult dataItemResult) {
+                            if (!dataItemResult.getStatus().isSuccess()) {
+                                Log.e(LOG_TAG, "ERROR: failed to putDataItem, status code: " + dataItemResult.getStatus().getStatusCode());
+                            }
                         }
-                    }
-                }
-            );
+                    });
+        }
     }
 }

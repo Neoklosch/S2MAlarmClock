@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
@@ -21,6 +20,7 @@ public class AlarmClockWatchFace extends Activity {
     private TextView mTextViewBattery;
 
     private final static IntentFilter INTENT_FILTER;
+
     static {
         INTENT_FILTER = new IntentFilter();
         INTENT_FILTER.addAction(Intent.ACTION_TIME_TICK);
